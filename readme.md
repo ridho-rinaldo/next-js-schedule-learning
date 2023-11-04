@@ -1,11 +1,11 @@
 
 # Class Management System
 
-A Class Management System is a software application or platform designed to efficiently manage and organize various aspects of educational institutions or classes, making it easier for administrators to manage.
+Class Management System is a software application or platform designed to efficiently manage and organize various aspects of educational institutions or classes, making it easier for administrators to manage.
 
 ### 1. Dashboard
 ![alt text](https://github.com/ridho-rinaldo/next-js-schedule-learning/blob/create_comment/screenshot/dashboard.png?raw=true)
-Admin could use Dashboard to view Total Teacher, Subject, Class and Class Schedule (wheater is active or not active)
+Admin could use Dashboard to view Total Teacher, Subject, Class and Class Schedule (whether is active or not active)
 
 ### 2. Teacher
 ![alt text](https://github.com/ridho-rinaldo/next-js-schedule-learning/blob/create_comment/screenshot/teacher.png?raw=true)
