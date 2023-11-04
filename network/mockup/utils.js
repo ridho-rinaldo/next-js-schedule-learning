@@ -1,9 +1,11 @@
 import { notification } from "antd"
 
+// Function to display a notification message
 export const callNotification = (type, description) => {
+    // Show a notification using Ant Design's notification component
     notification[type]({
-        message: 'Notification',
-        description
+        message: 'Notification', // Set the message title
+        description // Display the provided description in the notification
     })
 }
 

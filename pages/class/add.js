@@ -16,12 +16,17 @@ const Option = Select.Option;
 
 function AddClass() {
 
+    /** Initiate dispatch for action redux */
     const dispatch = useDispatch();
+
+    /** Get Function of Navigation */
     const { push, query } = useRouter()
 
+    /** Fetch data from redux */
     const listSubject = useSelector((state) => state.subject.dropdownList)
     const listTeacher = useSelector((state) => state.teacher.dropdownList)
 
+    /** Create state date */
     const [class_name, setClassName] = useState('')
     const [subject_code, setSubjectCode] = useState('')
     const [subject_name, setSubjectName] = useState('')
@@ -30,8 +35,8 @@ function AddClass() {
     const [title, setTitle] = useState('')
     const [status, setStatus] = useState('')
 
+    /** Fetch details of the selected class */
     const detail = async () => {
-
         const payload = {
             teacher_num: query.id
         }
@@ -53,6 +58,7 @@ function AddClass() {
             })
     }
 
+    /** Fetch subject dropdown data */
     const subjectDropdown = async () => {
         dispatch(setLoading(true))
 
@@ -71,6 +77,7 @@ function AddClass() {
             })
     }
 
+    /** Fetch teacher dropdown data */
     const teacherDropdown = async () => {
         dispatch(setLoading(true))
 
@@ -90,14 +97,18 @@ function AddClass() {
     }
 
     useEffect(() => {
-        teacherDropdown()
-        subjectDropdown()
+        // Fetch teacher and subject dropdown data when the component mounts
+        teacherDropdown();
+        subjectDropdown();
+
         if (query.id != undefined) {
-            detail()
+            detail(); // If there's an "id" parameter in the URL query, fetch class details
         }
-    }, [dispatch])
+    }, [dispatch]);
+
 
     const changeSubject = (_, raw) => {
+        // Extract and set the subject name and code from the selected value
         let value = raw.value.split(' - ')
 
         setSubjectName(raw.children)
@@ -105,6 +116,7 @@ function AddClass() {
     }
 
     const changeTeacher = (_, raw) => {
+        // Extract and set the teacher name, number, and title from the selected value
         let value = raw.value.split(' - ')
 
         setTeacherName(raw.children)
@@ -113,12 +125,14 @@ function AddClass() {
     }
 
     const submit = async () => {
-
+        // Check if all required fields are filled in
         if (class_name == "" || subject_code == "" || subject_name == "" || teacher_num == "" || teacher_name == "" || title == "" || status == "") {
-            callNotification("error", "Please fill in all the required fields to proceed.")
-            return
+            // Show an error notification if any required field is empty
+            callNotification("error", "Please fill in all the required fields to proceed.");
+            return; // Exit the function if required fields are empty
         }
 
+        // Create a payload object with class data
         const payload = {
             class_name,
             subject_code,
@@ -127,20 +141,25 @@ function AddClass() {
             teacher_name,
             title,
             status
-        }
+        };
 
-        dispatch(setLoading(true))
+        // Set the loading state to indicate data submission is in progress
+        dispatch(setLoading(true));
+
+        // Call the ClassAPI.Create function to create a new class with the provided payload
         await ClassAPI.Create(payload)
             .then(res => {
                 if (res.success) {
-                    push('/class')
+                    // If the class creation is successful, navigate to the '/class' page
+                    push('/class');
                 }
             })
             .catch(err => {
-                console.log(err)
-                dispatch(setLoading(false))
-            })
+                console.log(err);
+                dispatch(setLoading(false));
+            });
     }
+
     return (
         <div>
             <div className="mb-4">

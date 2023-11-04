@@ -3,16 +3,20 @@ import { EditFilled, DeleteFilled } from '@ant-design/icons';
 import { Fragment, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux'
-import { setLoading } from '../../redux/slice/authSlice';
-import SubjectAPI from '../../network/api/SubjectAPI';
+import { setLoading } from '../../../redux/slice/authSlice';
+import SubjectAPI from '../../../network/api/SubjectAPI';
 
 const confirm = Modal.confirm;
 
 const TableClass = ({ store, fetchData, sortData }) => {
 
+    /** Initiate dispatch for action redux */
     const dispatch = useDispatch();
+
+    // Initialize the router to handle navigation
     const router = useRouter();
 
+    // Define the columns for the teacher list table
     const column = [
         { title: '#', width: 75, dataIndex: 'key', key: 'key', fixed: 'left', align: 'center' },
         { title: 'Subject Code', width: 170, dataIndex: 'subject_code', key: 'subject_code', sorter: true },
@@ -32,13 +36,14 @@ const TableClass = ({ store, fetchData, sortData }) => {
     ]
     const [columns, setColumns] = useState(column)
 
+    // Handle sorting of the table data
     const onSort = (pagination, filters, sort) => {
         let field = sort.field
         let order = sort.order || ""
-
         fetchData(field, order)
     }
 
+    // Function to edit subject data
     const editData = (row) => {
         const query = { id: row.subject_code };
         router.push({
@@ -47,6 +52,7 @@ const TableClass = ({ store, fetchData, sortData }) => {
         })
     }
 
+    // Function to show a confirmation modal for deleting a subject's data
     const showDeleteConfirm = (row) => {
         confirm({
             title: 'Are you sure delete this data?',
@@ -60,6 +66,8 @@ const TableClass = ({ store, fetchData, sortData }) => {
                 }
 
                 dispatch(setLoading(true))
+
+                // Use the SubjectAPI to delete the subject's data
                 await SubjectAPI.Delete(payload)
                     .then(res => {
                         if (res.success) {

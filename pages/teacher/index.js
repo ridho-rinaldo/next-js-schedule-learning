@@ -1,5 +1,5 @@
 import { Breadcrumb, Button, Card, Form, Input, Select } from 'antd';
-import TableTeacher from './TableTeacher';
+import TableTeacher from './component/TableTeacher';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import TeacherAPI from '../../network/api/TeacherAPI';
@@ -11,10 +11,13 @@ const Option = Select.Option;
 
 function Teacher() {
 
+    // Initiate dispatch for action redux
     const dispatch = useDispatch();
 
+    /** Fetch data from redux */
     const store = useSelector((state) => state.teacher)
 
+    /** Create state date */
     const [teacher_num, setTeacherNum] = useState('')
     const [teacher_name, setTeacherName] = useState('')
     const [title, setTitle] = useState('')
@@ -24,11 +27,12 @@ function Teacher() {
 
     /** Fetch data table */
     const fetchData = async (field, order, reset) => {
-
+        // Set sorting parameters
         setSortBy(field)
         setSortType(order)
 
-        // If reset is true then use payload from value reset
+        // Create a payload object for the API request
+        // If reset is true, use the reset payload, otherwise use the current input values
         const payload = reset ? reset : {
             teacher_num,
             teacher_name,
@@ -37,15 +41,16 @@ function Teacher() {
             sortBy: field,
             sortType: order
         }
-
+        // Set loading state to true while fetching data
         dispatch(setLoading(true))
 
+        // Fetch teacher data from the API
         await TeacherAPI.List(payload)
             .then(res => {
-
                 const dataList = res.data
                 const buildData = []
 
+                // Map the retrieved data and add a 'key' property for rendering
                 dataList.map((item, i) => {
                     buildData.push({
                         key: i + 1,
@@ -53,9 +58,12 @@ function Teacher() {
                     })
                 })
 
+                // Prepare the response object for storing in Redux state
                 const resp = {
                     list_teacher: buildData
                 }
+
+                // Update the class data in Redux state and set loading to false
                 dispatch(setListTeacher(resp))
                 dispatch(setLoading(false))
             })
@@ -70,10 +78,12 @@ function Teacher() {
     }, [dispatch])
 
     const submit = () => {
+        // Trigger data fetching with the current sorting criteria
         fetchData(sortBy, sortType)
     }
 
     const reset = () => {
+        // Clear input fields and reset sorting criteria
         setTeacherNum('')
         setTeacherName('')
         setTitle('')
@@ -81,6 +91,7 @@ function Teacher() {
         setSortBy('')
         setSortType('descend')
 
+        // Prepare payload for reset and trigger data fetching
         const payload = {
             teacher_num: '',
             teacher_name: '',
@@ -89,7 +100,6 @@ function Teacher() {
             sortBy: '',
             sortType: 'descend'
         }
-
         fetchData('', 'descend', payload)
     }
 

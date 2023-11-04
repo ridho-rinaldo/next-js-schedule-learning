@@ -1,6 +1,6 @@
 import { Breadcrumb, Button, Card, Form, Input, Select } from 'antd';
-import TableClass from './TableClass';
-import UnassignedList from './UnassignedList';
+import TableClass from './component/TableClass';
+import UnassignedList from './component/UnassignedList';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import ClassAPI from '../../network/api/ClassAPI';
@@ -14,11 +14,14 @@ const Option = Select.Option;
 
 function Class() {
 
+    // Initiate dispatch for action redux
     const dispatch = useDispatch();
 
+    /** Fetch data from redux */
     const store = useSelector((state) => state.class)
     const unassignedList = useSelector((state) => state.teacher.unassignedList)
 
+    /** Create state date */
     const [class_name, setClassName] = useState('')
     const [subject_code, setSubjectCode] = useState('')
     const [subject_name, setSubjectName] = useState('')
@@ -34,110 +37,129 @@ function Class() {
 
     /** Fetch data table */
     const fetchData = async (field, order, reset) => {
-
-        setSortBy(field)
-        setSortType(order)
-
-        // If reset is true then use payload from value reset
-        const payload = reset ? reset : {
-            class_name,
-            subject_code,
-            subject_name,
-            teacher_num,
-            teacher_name,
-            title,
-            status,
-            sortBy: field,
-            sortType: order
-        }
-
-        dispatch(setLoading(true))
-
+        // Set sorting parameters
+        setSortBy(field);
+        setSortType(order);
+    
+        // Create a payload object for the API request
+        // If reset is true, use the reset payload, otherwise use the current input values
+        const payload = reset
+            ? reset
+            : {
+                class_name,
+                subject_code,
+                subject_name,
+                teacher_num,
+                teacher_name,
+                title,
+                status,
+                sortBy: field,
+                sortType: order
+            };
+    
+        // Set loading state to true while fetching data
+        dispatch(setLoading(true));
+    
+        // Fetch class data from the API
         await ClassAPI.List(payload)
             .then(res => {
-
-                const dataList = res.data
-                const buildData = []
-
+                const dataList = res.data;
+                const buildData = [];
+    
+                // Map the retrieved data and add a 'key' property for rendering
                 dataList.map((item, i) => {
                     buildData.push({
                         key: i + 1,
                         ...item
-                    })
-                })
-
+                    });
+                });
+    
+                // Prepare the response object for storing in Redux state
                 const resp = {
                     list_class: buildData
-                }
-
-                dispatch(setListClass(resp))
-                dispatch(setLoading(false))
+                };
+    
+                // Update the class data in Redux state and set loading to false
+                dispatch(setListClass(resp));
+                dispatch(setLoading(false));
             })
             .catch(err => {
-                console.log(err)
-                dispatch(setLoading(false))
-            })
+                console.log(err);
+                dispatch(setLoading(false));
+            });
     }
-
+    
+    /** Fetch data table for un assigned list teacher */
     const getUnassignedList = async (field, order, reset) => {
-
-        setUnAsSortBy(field)
-        setUnAsSortType(order)
-
-        // If reset is true then use payload from value reset
-        const payload = reset ? reset : {
-            sortBy: field,
-            sortType: order
-        }
-
-        dispatch(setLoading(true))
-
+        // Set sorting parameters for unassigned list
+        setUnAsSortBy(field);
+        setUnAsSortType(order);
+    
+        // Create a payload object for the API request
+        // If reset is true, use the reset payload, otherwise use the sorting parameters
+        const payload = reset
+            ? reset
+            : {
+                sortBy: field,
+                sortType: order
+            };
+    
+        // Set loading state to true while fetching unassigned teacher data
+        dispatch(setLoading(true));
+    
+        // Fetch unassigned teacher data from the API
         await TeacherAPI.UnassignedList(payload)
             .then(res => {
-
-                const dataList = res.data
-                const buildData = []
-
+                const dataList = res.data;
+                const buildData = [];
+    
+                // Map the retrieved data and add a 'key' property for rendering
                 dataList.map((item, i) => {
                     buildData.push({
                         key: i + 1,
                         ...item
-                    })
-                })
-
+                    });
+                });
+    
+                // Prepare the response object for storing in Redux state
                 const resp = {
                     data: buildData
-                }
-
-                dispatch(setUnassignedList(resp))
-                dispatch(setLoading(false))
+                };
+    
+                // Update the unassigned teacher data in Redux state and set loading to false
+                dispatch(setUnassignedList(resp));
+                dispatch(setLoading(false));
             })
             .catch(err => {
-                console.log(err)
-                dispatch(setLoading(false))
-            })
+                console.log(err);
+                dispatch(setLoading(false));
+            });
     }
 
     useEffect(() => {
-        fetchData(sortBy, sortType)
-        getUnassignedList()
-    }, [dispatch])
+        // Fetch class data and unassigned teacher data when component mounts or 'dispatch' changes
+        fetchData(sortBy, sortType);
+        getUnassignedList();
+    }, [dispatch]);    
 
     const submit = () => {
-        fetchData(sortBy, sortType)
+        // Trigger data fetching with the current sorting criteria
+        fetchData(sortBy, sortType);
     }
-
+    
     const reset = () => {
-        setClassName('')
-        setSubjectCode('')
-        setSubjectName('')
-        setTeacherNum('')
-        setTeacherName('')
-        setTitle('')
-        setTeacherStatus('')
-        setSortBy('')
-        setSortType('descend')
-
+        // Clear input fields and reset sorting criteria
+        setClassName('');
+        setSubjectCode('');
+        setSubjectName('');
+        setTeacherNum('');
+        setTeacherName('');
+        setTitle('');
+        setTeacherStatus('');
+        setSortBy('');
+        setSortType('descend');
+    
+        // Prepare payload for reset and trigger data fetching
         const payload = {
             class_name: '',
             subject_code: '',
@@ -147,11 +169,10 @@ function Class() {
             title: '',
             status: '',
             sortBy: '',
-            sortType: 'descend'
-        }
-
-        fetchData('', 'descend', payload)
-    }
+            sortType: 'descend',
+        };
+        fetchData('', 'descend', payload);
+    }    
 
     return (
         <div>

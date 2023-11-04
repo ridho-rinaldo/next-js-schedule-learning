@@ -2,17 +2,21 @@ import { Button, Modal, Row, Table } from 'antd';
 import { EditFilled, DeleteFilled } from '@ant-design/icons';
 import { Fragment, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import ClassAPI from '../../network/api/ClassAPI';
+import ClassAPI from '../../../network/api/ClassAPI';
 import { useDispatch } from 'react-redux'
-import { setLoading } from '../../redux/slice/authSlice';
+import { setLoading } from '../../../redux/slice/authSlice';
 
 const confirm = Modal.confirm;
 
 const TableClass = ({ store, fetchData, sortData }) => {
 
+    /** Initiate dispatch for action redux */
     const dispatch = useDispatch();
+
+    // Initialize the router to handle navigation
     const router = useRouter();
 
+    // Define the columns for the teacher list table
     const column = [
         { title: '#', width: 100, dataIndex: 'key', key: 'key', fixed: 'left', align: 'center' },
         { title: 'Class Name', dataIndex: 'class_name', key: 'class_name', sorter: true },
@@ -49,13 +53,14 @@ const TableClass = ({ store, fetchData, sortData }) => {
     ]
     const [columns, setColumns] = useState(column)
 
+    // Handle sorting of the table data
     const onSort = (pagination, filters, sort) => {
         let field = sort.field
         let order = sort.order || ""
-
         fetchData(field, order)
     }
 
+    // Function to edit class data
     const editData = (row) => {
         const query = { id: row.class_id };
         router.push({
@@ -64,6 +69,7 @@ const TableClass = ({ store, fetchData, sortData }) => {
         })
     }
 
+    // Function to show a confirmation modal for deleting a class's data
     const showDeleteConfirm = (row) => {
         confirm({
             title: 'Are you sure delete this data?',
@@ -77,6 +83,8 @@ const TableClass = ({ store, fetchData, sortData }) => {
                 }
 
                 dispatch(setLoading(true))
+
+                // Use the ClassAPI to delete the class's data
                 await ClassAPI.Delete(payload)
                     .then(res => {
                         if (res.success) {
@@ -94,7 +102,6 @@ const TableClass = ({ store, fetchData, sortData }) => {
             }
         });
     }
-
 
     return (
         <Fragment>

@@ -11,21 +11,27 @@ const Option = Select.Option;
 
 function AddTeacher() {
 
+    /** Initiate dispatch for action redux */
     const dispatch = useDispatch();
+
+    /** Get Function of Navigation */
     const { push } = useRouter()
 
+    /** Create state date */
     const [teacher_num, setTeacherNum] = useState('')
     const [teacher_name, setTeacherName] = useState('')
     const [title, setTitle] = useState('')
     const [status, setTeacherStatus] = useState('true')
 
     const submit = async () => {
-
+        // Check if required fields are filled in
         if (teacher_num == "" || teacher_name == "" || title == "" || status == "") {
+            // Show an error notification if any required field is empty
             callNotification("error", "Please fill in all the required fields to proceed.")
             return
         }
 
+        // Create a payload with the teacher information
         const payload = {
             teacher_num,
             teacher_name,
@@ -33,15 +39,20 @@ function AddTeacher() {
             status
         }
 
+        // Dispatch a loading action to indicate that data is being created
         dispatch(setLoading(true))
+
+        // Use the SubjectAPI to create a new subject with the provided payload
         await TeacherAPI.Create(payload)
             .then(res => {
                 if (res.success) {
+                    // If the creation is successful, navigate to the subject page
                     push('/teacher')
                 }
             })
             .catch(err => {
                 console.log(err)
+                // Dispatch a loading action to indicate that an error occurred
                 dispatch(setLoading(false))
             })
     }

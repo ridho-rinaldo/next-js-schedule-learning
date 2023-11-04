@@ -17,11 +17,16 @@ const TabPane = Tabs.TabPane;
 
 function AddClassSchedule() {
 
+    /** Initiate dispatch for action redux */
     const dispatch = useDispatch();
-    const { push } = useRouter()
 
+    /** Get Function of Navigation */
+    const { push, query } = useRouter()
+
+    /** Fetch data from redux */
     const listClass = useSelector((state) => state.class.dropdownList)
 
+    /** Create state date */
     const [class_id, setClassID] = useState('')
     const [class_name, setClassName] = useState('')
     const [subject_code, setSubjectCode] = useState('')
@@ -35,24 +40,7 @@ function AddClassSchedule() {
     const [tabKey, setTabKey] = useState("")
     const [listPerMeeting, setListPerMeeting] = useState([])
 
-    const classDropdown = async () => {
-        dispatch(setLoading(true))
-
-        await ClassAPI.Dropdown()
-            .then(res => {
-                const resp = {
-                    data: res.data
-                }
-
-                dispatch(setClassDropdown(resp))
-                dispatch(setLoading(false))
-            })
-            .catch(err => {
-                console.log(err)
-                dispatch(setLoading(false))
-            })
-    }
-
+    /** Fetch details of the selected class schedule */
     const subjectDetail = async (id) => {
 
         const payload = {
@@ -74,22 +62,46 @@ function AddClassSchedule() {
             })
     }
 
-    const getDetail = async (id) => {
+    /** Fetch class dropdown data */
+    const classDropdown = async () => {
+        dispatch(setLoading(true))
 
+        await ClassAPI.Dropdown()
+            .then(res => {
+                const resp = {
+                    data: res.data
+                }
+
+                dispatch(setClassDropdown(resp))
+                dispatch(setLoading(false))
+            })
+            .catch(err => {
+                console.log(err)
+                dispatch(setLoading(false))
+            })
+    }
+
+    const getDetailClass = async (id) => {
+        // Create a payload with the class ID to fetch class details
         const payload = {
             class_id: id
         }
 
+        // Set the loading state to indicate data retrieval is in progress
         dispatch(setLoading(true))
+
+        // Call the ClassAPI.Detail function to fetch class details
         await ClassAPI.Detail(payload)
             .then(res => {
-
                 const data = res.data
+
+                // Update state with subject, teacher information
                 setSubjectCode(data.subject_code)
                 setSubjectName(data.subject_name)
                 setTeacherNum(data.teacher_num)
                 setTeacherName(data.teacher_name)
 
+                // Call subjectDetail to fetch subject details based on subject code
                 subjectDetail(data.subject_code)
             })
             .catch(err => {
@@ -98,36 +110,37 @@ function AddClassSchedule() {
             })
     }
 
+    // Call classDropdown when the component mounts
     useEffect(() => {
         classDropdown()
     }, [dispatch])
 
     const changeClass = (_, raw) => {
+        // Extract class ID from the selected class option
         let value = raw.value.split(' - ')
 
+        // Set class name and ID, and retrieve class details for the selected class
         setClassName(raw.children)
         setClassID(value[0])
-
-        getDetail(value[0])
+        getDetailClass(value[0])
         setTabKey("1")
     }
 
     const changeMeetingDate = (date, dateString, index) => {
+        // Update the meeting date in the listPerMeeting state
         let meetings = [...listPerMeeting]
-
         const newData = {
             index,
             datetime: dateString,
             duration: Number(duration)
         }
         meetings = buildSchedulePerMeeting(meetings, index, newData)
-
         setListPerMeeting(meetings)
     }
 
     const changeMeetingStartTime = (raw, time, index) => {
+        // Update meeting start and end times in the listPerMeeting state
         let meetings = [...listPerMeeting]
-
         const newData = {
             index,
             start_time: time,
@@ -135,7 +148,6 @@ function AddClassSchedule() {
             duration: Number(duration)
         }
         meetings = buildSchedulePerMeeting(meetings, index, newData)
-
         setListPerMeeting(meetings)
     }
 
@@ -145,6 +157,7 @@ function AddClassSchedule() {
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const startDateObj = new Date(date);
 
+        // Generate data for a list of weeks (7 days)
         for (let i = 0; i < 7; i++) {
             const currentDate = new Date(startDateObj);
             currentDate.setDate(startDateObj.getDate() + i);
@@ -158,12 +171,13 @@ function AddClassSchedule() {
             dateData.push({ day, date, start_time, end_time, checked });
         }
 
+        // Update the list of weeks and the selected start date
         setListWeek(dateData)
         setStartDate(dateString)
     }
 
     const onCheckedDay = (val, index) => {
-
+        // Update the 'checked' property of a specific week in the list
         const buildData = [...listWeek]
         buildData[index].checked = val
 
@@ -171,32 +185,30 @@ function AddClassSchedule() {
     }
 
     const changeStartTime = (raw, time, index) => {
-
+        // Update the 'start_time' property based on selected end time
         const buildData = [...listWeek]
         buildData[index].start_time = time
         buildData[index].end_time = moment(raw).add(Number(duration), 'minutes').format("HH:mm")
-
         setListWeek(buildData)
     }
 
     const changeEndTime = (raw, time, index) => {
-
+        // Update the 'start_time' property based on selected end time
         const buildData = [...listWeek]
         buildData[index].start_time = time
-
         setListWeek(buildData)
     }
 
     const submit = async () => {
-
+        // Initialize an empty 'weeks' object and use the 'listPerMeeting' for 'detail_schedule'
         let weeks = {}
         let detail_schedule = listPerMeeting
 
+        // Depending on the tab selected (tabKey), generate or build 'weeks' and 'detail_schedule'
         if (tabKey == 1) {
             weeks = generateWeeklySchedule(detail_schedule)
         }
         if (tabKey == 2) {
-
             if (startDate == "") {
                 callNotification("error", "Please fill in all the required fields to proceed.")
                 return
@@ -205,8 +217,10 @@ function AddClassSchedule() {
                 return
             }
 
+            // Build 'weeks' and 'detail_schedule' based on user input
             weeks = buildListWeek(listWeek)
 
+            // Rebuild 'detail_schedule' based on 'weeks', 'startDate', 'total_meeting', and 'duration'
             detail_schedule = buildDetailSchedule(weeks, startDate, total_meeting, duration)
         }
 
@@ -215,6 +229,7 @@ function AddClassSchedule() {
             return
         }
 
+        // Create a payload with the necessary data for updating class schedules
         const payload = {
             class_id,
             class_name,
@@ -226,9 +241,11 @@ function AddClassSchedule() {
             detail_schedule
         }
 
+        // Send an update request with the payload to update the class schedules data
         dispatch(setLoading(true))
         await ClassScheduleAPI.Create(payload)
             .then(res => {
+                // Redirect to the class list if the update is successful
                 if (res.success) {
                     push('/class-schedule')
                 }

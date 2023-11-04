@@ -13,17 +13,23 @@ import ClassScheduleAPI from '../../network/api/ClassScheduleAPI';
 import { setClassDropdown } from '../../redux/slice/classSlice';
 import moment from "moment"
 import { buildDetailSchedule, buildListWeek, buildSchedulePerMeeting, generateWeeklySchedule, getListMeeting } from './utils'
+import { callNotification } from '../../network/mockup/utils';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
 
 function EditClassSchedule() {
 
-    const dispatch = useDispatch();
+    /** Initiate dispatch for action redux */
+    const dispatch = useDispatch()
+
+    /** Get Function of Navigation */
     const { push, query } = useRouter()
 
+    /** Fetch data from redux */
     const listClass = useSelector((state) => state.class.dropdownList)
 
+    /** Create state date */
     const [class_id, setClassID] = useState('')
     const [class_name, setClassName] = useState('')
     const [subject_code, setSubjectCode] = useState('')
@@ -58,8 +64,8 @@ function EditClassSchedule() {
             })
     }
 
+    /** Fetch details of the selected class schedule */
     const detail = async () => {
-
         const payload = {
             schedule_id: query.id
         }
@@ -87,6 +93,7 @@ function EditClassSchedule() {
             })
     }
 
+    /** Fetch class dropdown data */
     const classDropdown = async () => {
         dispatch(setLoading(true))
 
@@ -105,22 +112,27 @@ function EditClassSchedule() {
             })
     }
 
-    const getDetail = async (id) => {
-
+    const getDetailClass = async (id) => {
+        // Create a payload with the class ID to fetch class details
         const payload = {
             class_id: id
         }
 
+        // Set the loading state to indicate data retrieval is in progress
         dispatch(setLoading(true))
+
+        // Call the ClassAPI.Detail function to fetch class details
         await ClassAPI.Detail(payload)
             .then(res => {
+                const data = res.data;
 
-                const data = res.data
+                // Update state with subject, teacher information
                 setSubjectCode(data.subject_code)
                 setSubjectName(data.subject_name)
                 setTeacherNum(data.teacher_num)
                 setTeacherName(data.teacher_name)
 
+                // Call subjectDetail to fetch subject details based on subject code
                 subjectDetail(data.subject_code)
             })
             .catch(err => {
@@ -129,110 +141,126 @@ function EditClassSchedule() {
             })
     }
 
+    // Call detail and classDropdown when the component mounts
     useEffect(() => {
         detail()
         classDropdown()
     }, [dispatch])
 
     const changeClass = (_, raw) => {
+        // Extract class ID from the selected class option
         let value = raw.value.split(' - ')
 
+        // Set class name and ID, and retrieve class details for the selected class
         setClassName(raw.children)
         setClassID(value[0])
-
-        getDetail(value[0])
+        getDetailClass(value[0])
         setTabKey("1")
     }
 
     const changeMeetingDate = (date, dateString, index) => {
-        let meetings = [...listPerMeeting]
-
+        // Update the meeting date in the listPerMeeting state
+        let meetings = [...listPerMeeting];
         const newData = {
             index,
             datetime: dateString,
             duration: Number(duration)
-        }
+        };
         meetings = buildSchedulePerMeeting(meetings, index, newData)
-
         setListPerMeeting(meetings)
     }
 
     const changeMeetingStartTime = (raw, time, index) => {
-        let meetings = [...listPerMeeting]
-
+        // Update meeting start and end times in the listPerMeeting state
+        let meetings = [...listPerMeeting];
         const newData = {
             index,
             start_time: time,
             end_time: moment(raw).add(Number(duration), 'minutes').format("HH:mm"),
             duration: Number(duration)
-        }
+        };
         meetings = buildSchedulePerMeeting(meetings, index, newData)
-
         setListPerMeeting(meetings)
     }
 
     const changeDate = (date, dateString) => {
-
         const dateData = [];
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const startDateObj = new Date(date);
+        const startDateObj = new Date(date)
 
+        // Generate data for a list of weeks (7 days)
         for (let i = 0; i < 7; i++) {
-            const currentDate = new Date(startDateObj);
-            currentDate.setDate(startDateObj.getDate() + i);
+            const currentDate = new Date(startDateObj)
+            currentDate.setDate(startDateObj.getDate() + i)
 
             const day = daysOfWeek[currentDate.getDay()];
-            const date = currentDate.toISOString().slice(0, 10);
+            const date = currentDate.toISOString().slice(0, 10)
             const start_time = "07:00";
-            const end_time = moment("2023-01-01 07:00").add(Number(duration), 'minutes').format("HH:mm");
-            const checked = false
+            const end_time = moment("2023-01-01 07:00").add(Number(duration), 'minutes').format("HH:mm")
+            const checked = false;
 
-            dateData.push({ day, date, start_time, end_time, checked });
+            dateData.push({ day, date, start_time, end_time, checked })
         }
 
+        // Update the list of weeks and the selected start date
         setListWeek(dateData)
         setStartDate(dateString)
     }
 
     const onCheckedDay = (val, index) => {
-
-        const buildData = [...listWeek]
-        buildData[index].checked = val
-
+        // Update the 'checked' property of a specific week in the list
+        const buildData = [...listWeek];
+        buildData[index].checked = val;
         setListWeek(buildData)
     }
 
     const changeStartTime = (raw, time, index) => {
-
-        const buildData = [...listWeek]
-        buildData[index].start_time = time
+        // Update the 'start_time' and 'end_time' properties based on selected start time
+        const buildData = [...listWeek];
+        buildData[index].start_time = time;
         buildData[index].end_time = moment(raw).add(Number(duration), 'minutes').format("HH:mm")
-
         setListWeek(buildData)
     }
 
     const changeEndTime = (raw, time, index) => {
-
-        const buildData = [...listWeek]
-        buildData[index].start_time = time
-
+        // Update the 'start_time' property based on selected end time
+        const buildData = [...listWeek];
+        buildData[index].start_time = time;
         setListWeek(buildData)
     }
 
     const submit = async () => {
-
+        // Initialize an empty 'weeks' object and use the 'listPerMeeting' for 'detail_schedule'
         let weeks = {}
         let detail_schedule = listPerMeeting
 
+        // Depending on the tab selected (tabKey), generate or build 'weeks' and 'detail_schedule'
         if (tabKey == 1) {
+            // Generate weekly schedule based on 'detail_schedule'
             weeks = generateWeeklySchedule(detail_schedule)
         }
         if (tabKey == 2) {
+            if (startDate == "") {
+                callNotification("error", "Please fill in all the required fields to proceed.")
+                return
+            } else if (!listWeek.some(item => item.checked === true)) {
+                callNotification("error", "Please select at least one day schedule.")
+                return
+            }
+
+            // Build 'weeks' and 'detail_schedule' based on user input
             weeks = buildListWeek(listWeek)
 
+            // Rebuild 'detail_schedule' based on 'weeks', 'startDate', 'total_meeting', and 'duration'
             detail_schedule = buildDetailSchedule(weeks, startDate, total_meeting, duration)
         }
 
+        if (class_name == "" || detail_schedule.length != total_meeting) {
+            callNotification("error", "Please fill in all the required fields to proceed.")
+            return
+        }
+
+        // Create a payload with the necessary data for updating class schedules
         const payload = {
             id: query.id,
             data: {
@@ -247,10 +275,11 @@ function EditClassSchedule() {
             }
         }
 
-        console.log(payload)
+        // Send an update request with the payload to update the class schedules data
         dispatch(setLoading(true))
         await ClassScheduleAPI.Update(payload)
             .then(res => {
+                // Redirect to the class list if the update is successful
                 if (res.success) {
                     push('/class-schedule')
                 }

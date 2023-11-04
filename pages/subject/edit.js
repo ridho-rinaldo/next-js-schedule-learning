@@ -10,51 +10,64 @@ const FormItem = Form.Item;
 
 function EditSubject() {
 
+    /** Initiate dispatch for action redux */
     const dispatch = useDispatch();
+
+    /** Get Function of Navigation */
     const { push, query } = useRouter()
 
+    /** Create state date */
     const [subject_code, setSubjectCode] = useState('')
     const [subject_name, setSubjectName] = useState('')
     const [duration, setDuration] = useState('')
     const [total_meeting, setTotalMeeting] = useState('')
 
+    /** Fetch details of the selected subject */
     const detail = async () => {
-
+        // Prepare a payload with the 'query.id' (assuming 'query.id' represents the subject ID)
         const payload = {
             subject_code: query.id
         }
 
-        dispatch(setLoading(true))
+        // Dispatch a loading action to indicate that data is being fetched
+        dispatch(setLoading(true));
+
+        // Fetch subject details using the SubjectAPI
         await SubjectAPI.Detail(payload)
             .then(res => {
+                // Extract subject data from the response
+                const data = res.data;
+                setSubjectCode(data.subject_code);
+                setSubjectName(data.subject_name);
+                setDuration(data.duration);
+                setTotalMeeting(data.total_meeting);
 
-                const data = res.data
-                setSubjectCode(data.subject_code)
-                setSubjectName(data.subject_name)
-                setDuration(data.duration)
-                setTotalMeeting(data.total_meeting)
-
-                dispatch(setLoading(false))
+                // Dispatch a loading action to indicate that data fetching is complete
+                dispatch(setLoading(false));
             })
             .catch(err => {
-                console.log(err)
-                dispatch(setLoading(false))
-            })
+                console.log(err);
+                // Dispatch a loading action to indicate that data fetching encountered an error
+                dispatch(setLoading(false));
+            });
     }
 
+    // Use the 'useEffect' hook to fetch subject details when 'query' changes
     useEffect(() => {
-        detail()
-    }, [query])
+        detail();
+    }, [query]);
 
     const submit = async () => {
-
+        // Check if required fields are filled in
         if (subject_name == "" || duration == "" || total_meeting == "") {
-            callNotification("error", "Please fill in all fields to proceed.")
-            return
+            // Show an error notification if any required field is empty
+            callNotification("error", "Please fill in all the required fields to proceed.");
+            return;
         }
 
+        // Create a payload for updating the subject
         const payload = {
-            id: query.id,
+            id: query.id, // Assuming 'query.id' is the subject ID
             data: {
                 subject_name,
                 duration,
@@ -62,17 +75,22 @@ function EditSubject() {
             }
         }
 
-        dispatch(setLoading(true))
+        // Dispatch a loading action to indicate that data is being updated
+        dispatch(setLoading(true));
+
+        // Update the subject using the SubjectAPI
         await SubjectAPI.Update(payload)
             .then(res => {
                 if (res.success) {
-                    push('/subject')
+                    // If the update is successful, navigate to the subject page
+                    push('/subject');
                 }
             })
             .catch(err => {
-                console.log(err)
-                dispatch(setLoading(false))
-            })
+                console.log(err);
+                // Dispatch a loading action to indicate that the update encountered an error
+                dispatch(setLoading(false));
+            });
     }
 
     return (

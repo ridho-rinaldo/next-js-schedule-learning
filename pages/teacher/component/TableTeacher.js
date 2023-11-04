@@ -2,17 +2,21 @@ import { Button, Modal, Row, Table } from 'antd';
 import { EditFilled, DeleteFilled } from '@ant-design/icons';
 import { Fragment, useState } from 'react';
 import { useRouter } from 'next/router';
-import TeacherAPI from '../../network/api/TeacherAPI';
+import TeacherAPI from '../../../network/api/TeacherAPI';
 import { useDispatch } from 'react-redux'
-import { setLoading } from '../../redux/slice/authSlice';
+import { setLoading } from '../../../redux/slice/authSlice';
 
 const confirm = Modal.confirm;
 
 const TableTeacher = ({ store, fetchData, sortData }) => {
 
+    /** Initiate dispatch for action redux */
     const dispatch = useDispatch();
+
+    // Initialize the router to handle navigation
     const router = useRouter();
 
+    // Define the columns for the teacher list table= useRouter();
     const column = [
         { title: '#', width: 100, dataIndex: 'key', key: 'key', fixed: 'left', align: 'center' },
         { title: 'TRN', width: 170, dataIndex: 'teacher_num', key: 'teacher_num', sorter: true },
@@ -38,21 +42,23 @@ const TableTeacher = ({ store, fetchData, sortData }) => {
     ]
     const [columns, setColumns] = useState(column)
 
+    // Handle sorting of the table data
     const onSort = (pagination, filters, sort) => {
         let field = sort.field
         let order = sort.order || ""
-
         fetchData(field, order)
     }
 
+    // Function to edit teacher data
     const editData = (row) => {
         const query = { id: row.teacher_num };
         router.push({
             pathname: '/teacher/edit',
             query
-        })
+        });
     }
 
+    // Function to show a confirmation modal for deleting a teacher's data
     const showDeleteConfirm = (row) => {
         confirm({
             title: 'Are you sure delete this data?',
@@ -66,6 +72,8 @@ const TableTeacher = ({ store, fetchData, sortData }) => {
                 }
 
                 dispatch(setLoading(true))
+
+                // Use the TeacherAPI to delete the teacher's data
                 await TeacherAPI.Delete(payload)
                     .then(res => {
                         if (res.success) {

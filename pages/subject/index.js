@@ -1,5 +1,5 @@
 import { Breadcrumb, Button, Card, Form, Input } from 'antd';
-import TableSubject from './TableSubject';
+import TableSubject from './component/TableSubject';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import SubjectAPI from '../../network/api/SubjectAPI';
@@ -10,10 +10,13 @@ const FormItem = Form.Item;
 
 function Subject() {
 
+    // Initiate dispatch for action redux
     const dispatch = useDispatch();
 
+    /** Fetch data from redux */
     const store = useSelector((state) => state.subject)
 
+    /** Create state date */
     const [subject_code, setSubjectCode] = useState('')
     const [subject_name, setSubjectName] = useState('')
     const [duration, setDuration] = useState('')
@@ -23,11 +26,12 @@ function Subject() {
 
     /** Fetch data table */
     const fetchData = async (field, order, reset) => {
-
+        // Set sorting parameters
         setSortBy(field)
         setSortType(order)
 
-        // If reset is true then use payload from value reset
+        // Create a payload object for the API request
+        // If reset is true, use the reset payload, otherwise use the current input values
         const payload = reset ? reset : {
             subject_code,
             subject_name,
@@ -37,14 +41,16 @@ function Subject() {
             sortType: order
         }
 
+        // Set loading state to true while fetching data
         dispatch(setLoading(true))
 
+        // Fetch subject data from the API
         await SubjectAPI.List(payload)
             .then(res => {
-
                 const dataList = res.data
                 const buildData = []
 
+                // Map the retrieved data and add a 'key' property for rendering
                 dataList.map((item, i) => {
                     buildData.push({
                         key: i + 1,
@@ -52,9 +58,12 @@ function Subject() {
                     })
                 })
 
+                // Prepare the response object for storing in Redux state
                 const resp = {
                     list_subject: buildData
                 }
+
+                // Update the class data in Redux state and set loading to false
                 dispatch(setListSubject(resp))
                 dispatch(setLoading(false))
             })
@@ -69,10 +78,12 @@ function Subject() {
     }, [dispatch])
 
     const submit = () => {
+        // Trigger data fetching with the current sorting criteria
         fetchData(sortBy, sortType)
     }
 
     const reset = () => {
+        // Clear input fields and reset sorting criteria
         setSubjectCode('')
         setSubjectName('')
         setDuration('')
@@ -80,6 +91,7 @@ function Subject() {
         setSortBy('')
         setSortType('descend')
 
+        // Prepare payload for reset and trigger data fetching
         const payload = {
             subject_code: '',
             subject_name: '',
@@ -88,7 +100,6 @@ function Subject() {
             sortBy: '',
             sortType: 'descend'
         }
-        
         fetchData('', 'descend', payload)
     }
 

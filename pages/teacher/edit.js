@@ -11,51 +11,64 @@ const Option = Select.Option;
 
 function EditTeacher() {
 
+    /** Initiate dispatch for action redux */
     const dispatch = useDispatch();
+
+    /** Get Function of Navigation */
     const { push, query } = useRouter()
 
+    /** Create state date */
     const [teacher_num, setTeacherNum] = useState('')
     const [teacher_name, setTeacherName] = useState('')
     const [title, setTitle] = useState('')
     const [status, setTeacherStatus] = useState('')
 
+    /** Fetch details of the selected subject */
     const detail = async () => {
-
+        // Prepare a payload with the 'query.id' (assuming 'query.id' represents the subject ID)
         const payload = {
             teacher_num: query.id
         }
 
+        // Dispatch a loading action to indicate that data is being fetched
         dispatch(setLoading(true))
+
+        // Fetch subject details using the TeacherAPI
         await TeacherAPI.Detail(payload)
             .then(res => {
-
+                // Extract subject data from the response
                 const data = res.data
                 setTeacherNum(data.teacher_num)
                 setTeacherName(data.teacher_name)
                 setTitle(data.title)
                 setTeacherStatus(String(data.status))
 
+                // Dispatch a loading action to indicate that data fetching is complete
                 dispatch(setLoading(false))
             })
             .catch(err => {
                 console.log(err)
+                // Dispatch a loading action to indicate that data fetching encountered an error
                 dispatch(setLoading(false))
             })
     }
 
+    // Use the 'useEffect' hook to fetch subject details when 'query' changes
     useEffect(() => {
         detail()
     }, [query])
 
     const submit = async () => {
-
+        // Check if required fields are filled in
         if (teacher_name == "" || title == "" || status == "") {
+            // Show an error notification if any required field is empty
             callNotification("error", "Please fill in all fields to proceed.")
             return
         }
 
+        // Create a payload for updating the subject
         const payload = {
-            id: query.id,
+            id: query.id, // Assuming 'query.id' is the teacher ID
             data: {
                 teacher_name,
                 title,
@@ -63,15 +76,20 @@ function EditTeacher() {
             }
         }
 
+        // Dispatch a loading action to indicate that data is being updated
         dispatch(setLoading(true))
+
+        // Update the subject using the TeacherAPI
         await TeacherAPI.Update(payload)
             .then(res => {
                 if (res.success) {
+                    // If the update is successful, navigate to the subject page
                     push('/teacher')
                 }
             })
             .catch(err => {
                 console.log(err)
+                // Dispatch a loading action to indicate that the update encountered an error
                 dispatch(setLoading(false))
             })
     }

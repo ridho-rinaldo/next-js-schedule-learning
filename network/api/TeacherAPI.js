@@ -7,8 +7,8 @@ import { callNotification, deleteData, filter, sortData, updateData } from "../m
 export default class TeacherAPI {
 
     static List(payload) {
+        // Build query parameters based on the payload
         let params = ''
-
         if (payload.sortBy) {
             params += `?sortBy=${(payload.sortBy ? encodeURIComponent((String(payload.sortBy).replace('%', '\\%')).trim()) : "")}`
         }
@@ -29,16 +29,17 @@ export default class TeacherAPI {
         }
 
         return new Promise(((resolve, reject) => {
-            API.get(apiUrl.teacher.list + params, {})
+            API.get(apiUrl.teacher.list + params, {}) // Make a GET request to retrieve the list of subjects
                 .then((result) => {
                     const data = result.data
                     if (data.code === 200) {
-                        resolve({ data: data.data, success: true })
+                        resolve({ data: data.data, success: true }) // Resolve with successful response
                     } else {
                         callNotification('error', "Failed to retrieve the list of data.")
-                        resolve({ data, success: false })
+                        resolve({ data, success: false }) // Resolve with unsuccessful response
                     }
                 }, (err) => {
+                    // Handle errors or simulate data retrieval from the mockup
                     setTimeout(() => {
                         const data = DummyListTeacher
 
@@ -62,18 +63,20 @@ export default class TeacherAPI {
     }
 
     static Create(payload) {
+        // Handling subject creation, but the API endpoint should match the subject API
 
         return new Promise(((resolve, reject) => {
-            API.post(apiUrl.teacher.create, payload, {})
+            API.post(apiUrl.teacher.create, payload, {}) // Make a POST request to create a subject
                 .then((result) => {
                     const data = result.data
                     if (data.code === 200) {
-                        resolve({ success: true })
+                        resolve({ success: true }) // Resolve with successful response
                     } else {
                         callNotification('error', "Failed to create the data.")
-                        resolve({ success: false })
+                        resolve({ success: false }) // Resolve with unsuccessful response
                     }
                 }, (err) => {
+                    // Handle errors or simulate data creation in the mockup
                     setTimeout(() => {
                         const data = DummyListTeacher
 
@@ -106,16 +109,17 @@ export default class TeacherAPI {
         let params = payload.teacher_num
 
         return new Promise(((resolve, reject) => {
-            API.get(apiUrl.teacher.detail + params, {})
+            API.get(apiUrl.teacher.detail + params, {}) // Make a GET request to retrieve details of a subject
                 .then((result) => {
                     const data = result.data
                     if (data.code === 200) {
-                        resolve({ data: data.data, success: true })
+                        resolve({ data: data.data, success: true }) // Resolve with successful response
                     } else {
                         callNotification('error', "Failed to get detail data.")
-                        resolve({ data, success: false })
+                        resolve({ data, success: false }) // Resolve with unsuccessful response
                     }
                 }, (err) => {
+                    // Handle errors or simulate data retrieval from the mockup
                     setTimeout(() => {
                         const data = DummyListTeacher
 
@@ -140,12 +144,13 @@ export default class TeacherAPI {
                 .then((result) => {
                     const data = result.data
                     if (data.code === 200) {
-                        resolve({ success: true })
+                        resolve({ success: true }) // Resolve with successful response
                     } else {
                         callNotification('error', "Failed to update data.")
-                        resolve({ data, success: false })
+                        resolve({ data, success: false }) // Resolve with unsuccessful response
                     }
                 }, (err) => {
+                     // Handle errors or simulate data update in the mockup
                     setTimeout(() => {
                         const data = DummyListTeacher
 
@@ -172,11 +177,12 @@ export default class TeacherAPI {
                 .then((result) => {
                     const data = result.data
                     if (data.code === 200) {
-                        resolve({ data: null, success: true })
+                        resolve({ data: null, success: true }) // Resolve with successful response
                     } else {
                         resolve({ success: false, message: "An error occurred while deleting the data." })
                     }
                 }, (err) => {
+                    // Handle errors or simulate data deletion in the mockup
                     setTimeout(() => {
                         const data = DummyListTeacher
 
@@ -203,11 +209,12 @@ export default class TeacherAPI {
                 .then((result) => {
                     const data = result.data
                     if (data.code === 200) {
-                        resolve({ data: null, success: true })
+                        resolve({ data: null, success: true }) // Resolve with successful response
                     } else {
                         resolve({ success: false, message: "Error while get dropdown data" })
                     }
                 }, (err) => {
+                    // Handle errors or simulate building dropdown data in the mockup
                     setTimeout(() => {
                         const data = DummyListTeacher
 
@@ -226,8 +233,8 @@ export default class TeacherAPI {
     }
 
     static UnassignedList(payload) {
+        // Build query parameters based on the payload
         let params = ''
-        
         if (payload.sortBy) {
             params += `?sortBy=${(payload.sortBy ? encodeURIComponent((String(payload.sortBy).replace('%', '\\%')).trim()) : "")}`
         }
@@ -240,11 +247,12 @@ export default class TeacherAPI {
                 .then((result) => {
                     const data = result.data
                     if (data.code === 200) {
-                        resolve({ data: null, success: true })
+                        resolve({ data: null, success: true }) // Resolve with successful response
                     } else {
                         resolve({ success: false, message: "Error while get data" })
                     }
                 }, (err) => {
+                    // Handle errors or simulate building dropdown data in the mockup
                     setTimeout(() => {
                         const data = DummyListTeacher
 

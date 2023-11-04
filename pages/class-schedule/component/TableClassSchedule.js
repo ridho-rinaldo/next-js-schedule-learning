@@ -2,18 +2,22 @@ import { Button, Col, Modal, Row, Table } from 'antd';
 import { EditFilled, DeleteFilled } from '@ant-design/icons';
 import { Fragment, useState } from 'react';
 import { useRouter } from 'next/router';
-import ClassScheduleAPI from '../../network/api/ClassScheduleAPI';
+import ClassScheduleAPI from '../../../network/api/ClassScheduleAPI';
 import { useDispatch } from 'react-redux'
-import { setLoading } from '../../redux/slice/authSlice';
+import { setLoading } from '../../../redux/slice/authSlice';
 import moment from 'moment'
 
 const confirm = Modal.confirm;
 
 const TableClassSchedule = ({ store, fetchData, sortData }) => {
 
+    /** Initiate dispatch for action redux */
     const dispatch = useDispatch();
+
+    // Initialize the router to handle navigation
     const router = useRouter();
 
+    // Define the columns for the teacher list table
     const [showModal, setShowModal] = useState(false)
     const [dataModal, setDataModal] = useState([])
     const column = [
@@ -50,26 +54,7 @@ const TableClassSchedule = ({ store, fetchData, sortData }) => {
     ]
     const [columns, setColumns] = useState(column)
 
-    // useEffect(() => {
-    //     const tempData = []
-    //     for (let i = 0; i < 100; i++) {
-    //         tempData.push({
-    //             key: i,
-    //             class_name: `Mathematics Class - ${i}`,
-    //             subject_name: `Statistika ${i}`,
-    //             teacher_name: `Jim Green ${i}`,
-    //             monday: '14:30 - 16:00',
-    //             tuesday: '',
-    //             wednesday: '',
-    //             thursday: '',
-    //             friday: '15:00 - 16:30',
-    //             saturday: '13:15 - 14:45',
-    //             sunday: '',
-    //         });
-    //     }
-    //     setData(tempData)
-    // }, [columns])
-
+    // Handle sorting of the table data
     const onSort = (pagination, filters, sort) => {
         let field = sort.field
         let order = sort.order || ""
@@ -79,18 +64,23 @@ const TableClassSchedule = ({ store, fetchData, sortData }) => {
 
     const showDetail = (row) => {
         const buildSchedule = []
-
+    
+        // Loop through the detail_schedule array and build a new array for displaying the schedule
         row.detail_schedule.map((item, index) => {
             buildSchedule.push({
                 key: index + 1,
                 ...item
             })
         })
-
-        setShowModal(true)
-        setDataModal(buildSchedule)
+    
+        // Set the 'showModal' state to true, which will display the modal
+        // Set the 'dataModal' state with the detailed schedule information
+        setShowModal(true);
+        setDataModal(buildSchedule);
     }
+    
 
+    // Function to edit schedule data
     const editData = (row) => {
         const query = { id: row.schedule_id };
         router.push({
@@ -99,6 +89,7 @@ const TableClassSchedule = ({ store, fetchData, sortData }) => {
         })
     }
 
+    // Function to show a confirmation modal for deleting a schedule's data
     const showDeleteConfirm = (row) => {
         confirm({
             title: 'Are you sure delete this data?',
@@ -112,6 +103,8 @@ const TableClassSchedule = ({ store, fetchData, sortData }) => {
                 }
 
                 dispatch(setLoading(true))
+
+                // Use the ClassScheduleAPI to delete the schedule's data
                 await ClassScheduleAPI.Delete(payload)
                     .then(res => {
                         if (res.success) {
@@ -152,7 +145,7 @@ const TableClassSchedule = ({ store, fetchData, sortData }) => {
                 <Col>
                     <Table columns={[
                         { title: '#', width: 50, dataIndex: 'key', key: 'key', align: 'center' },
-                        { title: 'Date',render:(row) => <span>{moment(row.datetime).format("dddd, DD MMMM YYYY")}</span> },
+                        { title: 'Date', render: (row) => <span>{moment(row.datetime).format("dddd, DD MMMM YYYY")}</span> },
                         { title: 'Time Duration', render: (row) => <span>{`${row.start_time} - ${row.end_time}`}</span> },
                     ]} dataSource={dataModal} bordered />
                 </Col>

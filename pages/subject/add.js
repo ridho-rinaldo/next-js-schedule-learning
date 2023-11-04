@@ -10,21 +10,27 @@ const FormItem = Form.Item;
 
 function AddSubject() {
 
+    /** Initiate dispatch for action redux */
     const dispatch = useDispatch();
+
+    /** Get Function of Navigation */
     const { push } = useRouter()
 
+    /** Create state date */
     const [subject_code, setSubjectCode] = useState('')
     const [subject_name, setSubjectName] = useState('')
     const [duration, setDuration] = useState('')
     const [total_meeting, setTotalMeeting] = useState('')
 
     const submit = async () => {
-
+        // Check if required fields are filled in
         if (subject_code == "" || subject_name == "" || duration == "" || total_meeting == "") {
-            callNotification("error", "Please fill in all the required fields to proceed.")
-            return
+            // Show an error notification if any required field is empty
+            callNotification("error", "Please fill in all the required fields to proceed.");
+            return;
         }
 
+        // Create a payload with the subject information
         const payload = {
             subject_code,
             subject_name,
@@ -32,17 +38,22 @@ function AddSubject() {
             total_meeting
         }
 
-        dispatch(setLoading(true))
+        // Dispatch a loading action to indicate that data is being created
+        dispatch(setLoading(true));
+
+        // Use the SubjectAPI to create a new subject with the provided payload
         await SubjectAPI.Create(payload)
             .then(res => {
                 if (res.success) {
-                    push('/subject')
+                    // If the creation is successful, navigate to the subject page
+                    push('/subject');
                 }
             })
             .catch(err => {
-                console.log(err)
-                dispatch(setLoading(false))
-            })
+                console.log(err);
+                // Dispatch a loading action to indicate that an error occurred
+                dispatch(setLoading(false));
+            });
     }
 
     return (
