@@ -7,3 +7,7 @@ haters/
 layout.md
 variables.env
 .vercel
+/.firebase
+build/
+.firebaserc
+firebase.json

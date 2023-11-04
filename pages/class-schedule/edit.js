@@ -3,16 +3,13 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react'
 import ClassAPI from '../../network/api/ClassAPI';
 import SubjectAPI from '../../network/api/SubjectAPI';
-import TeacherAPI from '../../network/api/TeacherAPI';
 import { useDispatch, useSelector } from 'react-redux'
 import { setLoading } from '../../redux/slice/authSlice';
 import SelectComponent from '../../components/Select';
-import { setSubjectDropdown } from '../../redux/slice/subjectSlice';
-import { setTeacherDropdown } from '../../redux/slice/teacherSlice';
 import ClassScheduleAPI from '../../network/api/ClassScheduleAPI';
 import { setClassDropdown } from '../../redux/slice/classSlice';
 import moment from "moment"
-import { buildDetailSchedule, buildListWeek, buildSchedulePerMeeting, generateWeeklySchedule, getListMeeting } from './utils'
+import { buildDetailSchedule, buildListWeek, buildSchedulePerMeeting, generateWeeklySchedule, getListMeeting } from '../../lib/utils'
 import { callNotification } from '../../network/mockup/utils';
 
 const FormItem = Form.Item;

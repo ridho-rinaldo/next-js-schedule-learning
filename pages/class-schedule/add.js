@@ -9,7 +9,7 @@ import { setClassDropdown } from '../../redux/slice/classSlice';
 import { setLoading } from '../../redux/slice/authSlice';
 import SubjectAPI from '../../network/api/SubjectAPI';
 import ClassScheduleAPI from '../../network/api/ClassScheduleAPI';
-import { buildDetailSchedule, buildListWeek, buildSchedulePerMeeting, generateWeeklySchedule, getEndDate } from './utils'
+import { buildDetailSchedule, buildListWeek, buildSchedulePerMeeting, generateWeeklySchedule, getEndDate } from '../../lib/utils'
 import { callNotification } from '../../network/mockup/utils';
 
 const FormItem = Form.Item;
