@@ -3,6 +3,14 @@
 
 Class Management System is a software application or platform designed to efficiently manage and organize various aspects of educational institutions or classes, making it easier for administrators to manage.
 
+First of all, to run the repository I use this configuration
+
+node js: 14.17.3
+
+npm : 6.14.13
+
+browser: chrome
+
 ### 1. Dashboard
 ![alt text](https://github.com/ridho-rinaldo/next-js-schedule-learning/blob/create_comment/screenshot/dashboard.png?raw=true)
 Admin could use Dashboard to view Total Teacher, Subject, Class and Class Schedule (whether is active or not active)
