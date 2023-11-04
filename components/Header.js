@@ -1,18 +1,15 @@
-import { Avatar, Badge, Layout, List, Menu } from "antd";
-import { BellTwoTone, CaretDownOutlined, InteractionTwoTone, PlaySquareTwoTone, SettingTwoTone } from '@ant-design/icons';
-import DashHeader, { Notification } from "./styles/Header";
+import { Avatar, Layout, Menu } from "antd";
+import { PlaySquareTwoTone } from '@ant-design/icons';
+import DashHeader from "./styles/Header";
 
 import Link from "next/link";
-import MockNotifications from "../demos/mock/notifications";
 import { useAppState } from "./shared/AppProvider";
-import { useState } from "react";
 
 const { SubMenu } = Menu;
 const { Header } = Layout;
 
 const MainHeader = () => {
   const [state, dispatch] = useAppState();
-  const [notifications] = useState(MockNotifications);
   return (
     <DashHeader>
       <Header>
@@ -46,100 +43,9 @@ const MainHeader = () => {
             </Link>
           </Menu.Item>
 
-          {!state.mobile && (
-            <Menu.Item>
-              <Link href="/apps/calendar">
-                <a>Calendar</a>
-              </Link>
-            </Menu.Item>
-          )}
-
-          {!state.mobile && (
-            <Menu.Item>
-              <Link href="/apps/messages">
-                <a>Messages</a>
-              </Link>
-            </Menu.Item>
-          )}
-
-          {!state.mobile && (
-            <Menu.Item>
-              <Link href="/apps/social">
-                <a>Social</a>
-              </Link>
-            </Menu.Item>
-          )}
-
-          {!state.mobile && (
-            <Menu.Item>
-              <Link href="/apps/chat">
-                <a>Chat</a>
-              </Link>
-            </Menu.Item>
-          )}
-
-          {state.mobile && (
-            <SubMenu title={<CaretDownOutlined style={{ fontSize: '12px' }} />}>
-              <Menu.Item>Calendar</Menu.Item>
-              <Menu.Item>Messages</Menu.Item>
-              <Menu.Item>Social</Menu.Item>
-              <Menu.Item>Chat</Menu.Item>
-            </SubMenu>
-          )}
-
           <span className="mr-auto" />
 
-          {!state.mobile && (
-            <Menu.Item onClick={() => dispatch({ type: "fullscreen" })}>
-              <InteractionTwoTone style={{fontSize: '20px'}} />
-            </Menu.Item>
-          )}
-          <Menu.Item onClick={() => dispatch({ type: "options" })}>
-            <SettingTwoTone style={{fontSize: '20px'}} />
-          </Menu.Item>
-          <SubMenu
-            title={
-              <Badge count={5}>
-                <span className="submenu-title-wrapper">
-                <BellTwoTone style={{fontSize: '20px'}} />
-                </span>
-              </Badge>
-            }
-          >
-            <Menu.Item
-              className="p-0 bg-transparent"
-              style={{ height: "auto" }}
-            >
-              <List
-                className="header-notifications"
-                itemLayout="horizontal"
-                dataSource={notifications}
-                footer={<div>5 Notifications</div>}
-                renderItem={item => (
-                  <Notification>
-                    <List.Item>
-                      <List.Item.Meta
-                        avatar={item.avatar}
-                        title={<a href="/">{item.title}</a>}
-                        description={<small>{item.description}</small>}
-                      />
-                    </List.Item>
-                  </Notification>
-                )}
-              />
-            </Menu.Item>
-          </SubMenu>
-
           <SubMenu title={<Avatar src="/images/avatar.jpg" />}>
-            <Menu.Item>Settings</Menu.Item>
-            <Menu.Item>Profile</Menu.Item>
-            <Menu.Item>Notifications</Menu.Item>
-            <Menu.Divider />
-            <Menu.Item>
-              <Link href="//one-readme.fusepx.com">
-                <a>Help?</a>
-              </Link>
-            </Menu.Item>
             <Menu.Item>Signout</Menu.Item>
           </SubMenu>
         </Menu>

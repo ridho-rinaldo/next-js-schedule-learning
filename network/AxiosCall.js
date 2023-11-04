@@ -124,7 +124,6 @@ instance.interceptors.response.use(
     async error => {
         // Handle errors, including token refresh
         const message = error.response?.data.message
-        console.log(message)
 
         const originalRequest = error.config
         if (error.response.status === 401 && !originalRequest._retry) {

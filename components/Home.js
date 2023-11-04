@@ -25,6 +25,9 @@ import PostCard from './shared/PostCard';
 import StatCard from './shared/StatCard';
 import styled from 'styled-components';
 import { theme } from './styles/GlobalStyles';
+import { DummyListClass } from '../network/mockup/class';
+import { DummyListSubject } from '../network/mockup/subject';
+import { DummyListClassSchedule } from '../network/mockup/class-schedule';
 
 const { MonthPicker } = DatePicker;
 
@@ -120,7 +123,7 @@ const Overview = () => {
           <StatCard
             type="fill"
             title="Teachers"
-            value={103}
+            value={DummyListClass.data.length}
             icon={<ProfileTwoTone style={{ fontSize: '20px'}} />}
             color={theme.primaryColor}
             clickHandler={() => Message.info('Campaign stat button clicked')}
@@ -130,7 +133,7 @@ const Overview = () => {
           <StatCard
             type="fill"
             title="Subjects"
-            value={230}
+            value={DummyListSubject.data.length}
             icon={<AccountBookTwoTone style={{ fontSize: '20px'}}  />}
             color={theme.darkColor}
             clickHandler={() => Message.info('Customers stat button clicked')}
@@ -140,7 +143,7 @@ const Overview = () => {
           <StatCard
             type="fill"
             title="Class"
-            value={323}
+            value={DummyListClass.data.length}
             icon={<CalendarTwoTone style={{ fontSize: '20px'}} />}
             color={theme.warningColor}
             clickHandler={() => Message.info('Queries stat button clicked')}
@@ -150,7 +153,7 @@ const Overview = () => {
           <StatCard
             type="fill"
             title="Class Schedule"
-            value={870}
+            value={DummyListClassSchedule.data.length}
             icon={<CalendarTwoTone style={{ fontSize: '20px'}} />}
             color={theme.errorColor}
             clickHandler={() => Message.info('Opens stat button clicked')}
